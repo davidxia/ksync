@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ksync/ksync/pkg/cli"
-	"github.com/ksync/ksync/pkg/ksync"
 	"github.com/ksync/ksync/pkg/ksync/cluster"
 	"github.com/ksync/ksync/pkg/ksync/doctor"
 )
@@ -91,7 +90,7 @@ func localFlags(flags *pflag.FlagSet) {
 func remoteFlags(flags *pflag.FlagSet) { //nolint: gocyclo
 	flags.String(
 		"image",
-		fmt.Sprintf("ksync/ksync:git-%s", ksync.GitCommit),
+		fmt.Sprintf("ksync/ksync:git-%s", "14ec9e2"),
 		"the image to use on the cluster")
 	if err := flags.MarkHidden("image"); err != nil {
 		log.Fatal(err)

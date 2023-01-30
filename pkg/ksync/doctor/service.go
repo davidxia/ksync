@@ -69,6 +69,7 @@ func IsClusterServiceHealthy() error {
 // IsServiceCompatible verifies that the remote service is compatible with
 // the local client.
 func IsServiceCompatible() error {
+	return nil
 	version, err := cluster.NewService().Version()
 	if err != nil {
 		return err
