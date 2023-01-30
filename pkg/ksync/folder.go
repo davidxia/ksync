@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	canonicalPath "path"
+
 	// "path/filepath"
 	"time"
 
@@ -271,10 +272,14 @@ func (f *Folder) setDevices(listenerPort int32) error {
 		return err
 	}
 
-	localDevice := config.NewDeviceConfiguration(f.localServer.ID, host)
+	localConfig := config.New(f.localServer.ID)
+	localDevice, _, _ := localConfig.Device(f.localServer.ID)
+	localDevice.Name = host
 
-	remoteDevice := config.NewDeviceConfiguration(
-		f.remoteServer.ID, f.RemoteContainer.PodName)
+	remoteConfig := config.New(f.remoteServer.ID)
+	remoteDevice, _, _ := remoteConfig.Device(f.localServer.ID)
+	remoteDevice.Name = f.RemoteContainer.PodName
+
 	remoteDevice.Addresses = []string{
 		fmt.Sprintf("tcp://127.0.0.1:%d", listenerPort),
 	}
@@ -294,8 +299,11 @@ func (f *Folder) setDevices(listenerPort int32) error {
 // this is updated, the syncing will actually start (assuming the devices can
 // connect via. the local tunnel).
 func (f *Folder) setFolders() error {
-	localFolder := config.NewFolderConfiguration(
-		f.remoteServer.ID, f.id, f.id, fs.FilesystemTypeBasic, f.LocalPath)
+	localConfig := config.New(f.remoteServer.ID)
+	localFolder, _, _ := localConfig.Folder(f.remoteServer.URL)
+	localFolder.Label = f.id
+	localFolder.FilesystemType = fs.FilesystemTypeBasic
+	localFolder.Path = f.LocalPath
 
 	if f.LocalReadOnly {
 		localFolder.Type = config.FolderTypeSendOnly
@@ -307,8 +315,11 @@ func (f *Folder) setFolders() error {
 		return err
 	}
 
-	remoteFolder := config.NewFolderConfiguration(
-		f.localServer.ID, f.id, f.id, fs.FilesystemTypeBasic, remotePath)
+	remoteConfig := config.New(f.localServer.ID)
+	remoteFolder, _, _ := remoteConfig.Folder(f.localServer.URL)
+	remoteFolder.Label = f.id
+	remoteFolder.FilesystemType = fs.FilesystemTypeBasic
+	remoteFolder.Path = remotePath
 
 	if f.RemoteReadOnly {
 		remoteFolder.Type = config.FolderTypeSendOnly
